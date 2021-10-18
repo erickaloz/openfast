@@ -24,9 +24,9 @@ from numpy import linalg as LA
 from fast_io import load_output
 import rtestlib as rtl
 
-def readFASTOut(fastoutput):
+def readFASTOut(fastoutput, MD = False):
     try:
-        return load_output(fastoutput)
+        return load_output(fastoutput, MD)
     except Exception as e:
         rtl.exitWithError("Error: {}".format(e))
 

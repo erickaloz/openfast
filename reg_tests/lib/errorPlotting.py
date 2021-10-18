@@ -40,9 +40,9 @@ def _validateAndExpandInputs(argv):
     rtl.validateFileOrExit(baselineSolution)
     return (testSolution, baselineSolution, attribute)
 
-def _parseSolution(solution):
+def _parseSolution(solution, MD = False):
     try:
-        data, info, _ = load_output(solution)
+        data, info, _ = load_output(solution, MD)
         return (data, info)
     except Exception as e:
         rtl.exitWithError("Error: {}".format(e))
@@ -104,12 +104,12 @@ def _save_plot(script, div, path, attribute):
         div = div.replace("<div", " ".join(("<div", style)))
         f.write(div)
 
-def plotOpenfastError(testSolution, baselineSolution, attribute):
+def plotOpenfastError(testSolution, baselineSolution, attribute, MD = False):
     testSolution, baselineSolution, attribute = _validateAndExpandInputs([
         testSolution, baselineSolution, attribute
     ])
-    dict1, info1 = _parseSolution(testSolution)
-    dict2, info2 = _parseSolution(baselineSolution)
+    dict1, info1 = _parseSolution(testSolution, MD)
+    dict2, info2 = _parseSolution(baselineSolution, MD)
 
     try:
         channel = info1['attribute_names'].index(attribute)

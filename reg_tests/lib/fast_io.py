@@ -23,7 +23,7 @@ import os
 import numpy as np
 import struct
 
-def load_output(filename):
+def load_output(filename, MD = False):
     """
     Load a FAST binary or ascii output file
 
@@ -53,22 +53,35 @@ def load_output(filename):
                 print(f.readline())
             except UnicodeDecodeError:
                 return load_binary_output(filename)
-    return load_ascii_output(filename) + (np.ones(1),)
+    return load_ascii_output(filename, MD) + (np.ones(1),)
 
-def load_ascii_output(filename):
+def load_ascii_output(filename, MD = False):
     with open(filename) as f:
-        info = {}
-        info['name'] = os.path.splitext(os.path.basename(filename))[0]
-        header = [f.readline() for _ in range(8)]
-        info['description'] = header[4].strip()
-        info['attribute_names'] = header[6].split()
-        info['attribute_units'] = [unit[1:-1] for unit in header[7].split()]  #removing "()"
-        data = np.array([line.split() for line in f.readlines()], dtype=np.float)
-        if np.any(np.isnan(data)):
-            raise ValueError("NaN found in test data: {}".format(filename))
-        if np.any(np.isinf(data)):
-            raise ValueError("Infinity found in test data: {}".format(filename))
-        return data, info
+        if MD:
+            info = {}
+            info['name'] = os.path.splitext(os.path.basename(filename))[0]
+            header = [f.readline() for _ in range(2)]
+            info['attribute_names'] = header[0].split()
+            info['attribute_units'] = [unit[1:-1] for unit in header[1].split()]  #removing "()"
+            data = np.array([line.split() for line in f.readlines()], dtype=np.float)
+            if np.any(np.isnan(data)):
+                raise ValueError("NaN found in test data: {}".format(filename))
+            if np.any(np.isinf(data)):
+                raise ValueError("Infinity found in test data: {}".format(filename))
+            return data, info
+        else:
+            info = {}
+            info['name'] = os.path.splitext(os.path.basename(filename))[0]
+            header = [f.readline() for _ in range(8)]
+            info['description'] = header[4].strip()
+            info['attribute_names'] = header[6].split()
+            info['attribute_units'] = [unit[1:-1] for unit in header[7].split()]  #removing "()"
+            data = np.array([line.split() for line in f.readlines()], dtype=np.float)
+            if np.any(np.isnan(data)):
+                raise ValueError("NaN found in test data: {}".format(filename))
+            if np.any(np.isinf(data)):
+                raise ValueError("Infinity found in test data: {}".format(filename))
+            return data, info
 
 def load_binary_output(filename):
     """
